@@ -27,8 +27,17 @@ All upstream ROS 2 packages are on their `jazzy` branches, pinned in
 `makerspet_loki` and `makerspet_snoopy` are other robot models; they are pinned
 only because `kaiaai_bringup` declares them as runtime dependencies.
 
-Firmware: Kaia.ai ESP32 firmware `0.8.3-iron` (from
-[kaiaai/firmware](https://github.com/kaiaai/firmware)), built with the Arduino IDE.
+Firmware: [kaiaai/firmware](https://github.com/kaiaai/firmware) release
+**`v0.8.4`**, board config `config_mini_bdc_30p.yaml`, built with the Arduino IDE.
+Note that the v0.8.4 source still reports `FW_VERSION = "0.8.3-iron"` on the
+serial console; v0.8.4 only fixed the Ubuntu build and did not bump the string.
+The newer `v0.8.6` (pre-release, tested with Jazzy) leaves the motor/PID code
+unchanged; it adds LD19 LiDAR support and an optional distance/yaw stop limit
+carried in `cmd_vel.linear.z` / `cmd_vel.angular.x` (zero = disabled, which is
+what Nav2 and teleop send). As of v0.8.6 that limit check
+(`isOdomTargetReached`) appears inverted: it returns true while the travelled
+distance is still *below* the target, i.e. immediately after the command. Do not
+rely on it; it is irrelevant here because this repo always sends zeros.
 
 ## BLD-120MM ↔ `makerspet_mini`
 

@@ -28,7 +28,7 @@ why every upstream command below uses `robot_model:=makerspet_mini`.
 | MCU        | ESP32 DevKit v1 on a BDC-30P driver board, Kaia.ai firmware (Arduino) |
 | LiDAR      | LDROBOT LD14P (360°, 2D) |
 | Drive      | 2 × 12 V N20 gear motors with quadrature encoders (1035 PPR) |
-| Power      | 6 × AA |
+| Power      | 2 × 18650 Li-ion (upstream default is 6 × AA; the 18650 pack is a mod the build guide flags as at-your-own-risk) |
 | Link to PC | Wi-Fi (2.4 GHz) → micro-ROS agent on the ROS 2 PC |
 | IMU        | none: odometry comes from the wheel encoders only |
 
@@ -45,8 +45,8 @@ own words of what I ran; the authoritative, illustrated instructions
 **Platform:** Ubuntu 24.04, ROS 2 Jazzy, Gazebo Harmonic, native install (no Docker).
 
 1. **Build the robot and flash the firmware.** Follow the build guide. The
-   firmware is the Kaia.ai ESP32 firmware (tested here with `0.8.3`), flashed
-   from the Arduino IDE. Robot and network settings are entered through the
+   firmware is the Kaia.ai ESP32 firmware (tested here with release `v0.8.4`,
+   board config `config_mini_bdc_30p.yaml`), flashed from the Arduino IDE. Robot and network settings are entered through the
    robot's Wi-Fi setup page.
 2. **Build the upstream ROS 2 packages** into an underlay workspace. The exact
    commits this repo is tested against are pinned in [`upstream.repos`](upstream.repos):
