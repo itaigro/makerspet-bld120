@@ -1,0 +1,49 @@
+# Upstream packages this repo builds on, pinned to the commits it was developed
+# and tested against. Import into a workspace with:
+#   vcs import src < upstream.repos
+repositories:
+  kaiaai:
+    type: git
+    url: https://github.com/kaiaai/kaiaai.git
+    version: ef5fb2ab3433f83d3ed19765af792f8d2298d50b
+  kaiaai_bringup:
+    type: git
+    url: https://github.com/kaiaai/kaiaai_bringup.git
+    version: 321c1b2f9385860d0595f3953ab83e3ed0721516
+  kaiaai_gazebo:
+    type: git
+    url: https://github.com/kaiaai/kaiaai_gazebo.git
+    version: a6812dfa6560ffee2dae193601bf335b374cd009
+  kaiaai_msgs:
+    type: git
+    url: https://github.com/kaiaai/kaiaai_msgs.git
+    version: e17a601a3f748d10513e274aa65aaf77f96d7728
+  kaiaai_telemetry:
+    type: git
+    url: https://github.com/kaiaai/kaiaai_telemetry.git
+    version: 7ea0d663cc8c744be9707563f76a64fc06b93631
+  kaiaai_teleop:
+    type: git
+    url: https://github.com/kaiaai/kaiaai_teleop.git
+    version: 0158918f09eb45a0680cd95e6aae6cfdd6132670
+  makerspet:
+    type: git
+    url: https://github.com/makerspet/makerspet.git
+    version: e15deb092e545f0affb3163c8389a5b94673d4e3
+  makerspet_mini:
+    type: git
+    url: https://github.com/makerspet/makerspet_mini.git
+    version: 77d196b6749f577cc181c6263eaecef6ef808a6c
+  m-explore-ros2:
+    type: git
+    url: https://github.com/kaiaai/m-explore-ros2.git
+    version: 9279196223699bf407f5ca7617d411c969aec2d1
+  # Not used by the BLD-120MM, but declared as exec_depend by kaiaai_bringup.
+  makerspet_loki:
+    type: git
+    url: https://github.com/makerspet/makerspet_loki.git
+    version: e778ecde98b4f0dc2dcb32d25f43cb4cb4af1158
+  makerspet_snoopy:
+    type: git
+    url: https://github.com/makerspet/makerspet_snoopy.git
+    version: 412b9d792e8cc3b6a2ccbff3946e8a9cabe5077b

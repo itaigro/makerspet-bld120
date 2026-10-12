@@ -1,0 +1,21 @@
+# colcon
+build/
+install/
+log/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Experiment data (raw bags are large; processed CSV/plots are committed explicitly)
+*.db3
+*.mcap
+data/raw/
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store

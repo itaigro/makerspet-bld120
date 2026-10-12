@@ -1,0 +1,18 @@
+makerspet-bld120
+Copyright 2026 Itaigro
+
+This project is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+It builds on, and depends on, the open-source Kaia.ai / Maker's Pet robotics
+platform. None of the upstream packages are modified or vendored here; they are
+used as ROS 2 dependencies at the versions pinned in upstream.repos.
+
+  Kaia.ai platform        https://github.com/kaiaai        (Apache-2.0)
+  Maker's Pet robots      https://github.com/makerspet     (Apache-2.0)
+  BLD-120MM build guide   https://makerspet.com/blog/bld-120mm-pack/
+
+Files in this repository that are adapted from upstream sources are listed
+below together with their origin. Each such file also carries a header comment
+naming its source.
+
+  (none yet)
