@@ -1,0 +1,23 @@
+# Simulated encoder odometry, matching Kaia.ai firmware v0.8.4 on the BLD-120MM
+# (BDC-30P board config). Error terms are overridden from the launch file.
+encoder_odometry:
+  ros__parameters:
+    joints:
+      left: wheel_left_joint
+      right: wheel_right_joint
+    encoder:
+      ticks_per_rev: 4140     # 1035 PPR quadrature x 4 edges
+      slip_std: 0.0
+      seed: -1                # -1 = random seed
+    geometry:                 # what the firmware believes (config.yaml)
+      wheel_dia: 0.043
+      wheel_track: 0.105043
+    error:                    # firmware belief vs. simulated robot, percent
+      wheel_dia_left_pct: 0.0
+      wheel_dia_right_pct: 0.0
+      wheel_track_pct: 0.0
+    rate_hz: 20.0             # firmware telemetry period: 50 ms
+    frames:
+      odom: odom
+      base: base_footprint
+    publish_tf: true

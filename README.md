@@ -46,8 +46,8 @@ own words of what I ran; the authoritative, illustrated instructions
 
 1. **Build the robot and flash the firmware.** Follow the build guide. The
    firmware is the Kaia.ai ESP32 firmware (tested here with release `v0.8.4`,
-   board config `config_mini_bdc_30p.yaml`), flashed from the Arduino IDE. Robot and network settings are entered through the
-   robot's Wi-Fi setup page.
+   board config `config_mini_bdc_30p.yaml`), flashed from the Arduino IDE.
+   Robot and network settings are entered through the robot's Wi-Fi setup page.
 2. **Build the upstream ROS 2 packages** into an underlay workspace. The exact
    commits this repo is tested against are pinned in [`upstream.repos`](upstream.repos):
    ```bash
@@ -70,12 +70,14 @@ own words of what I ran; the authoritative, illustrated instructions
    ros2 run nav2_map_server map_saver_cli -f ~/maps/home
    ros2 launch kaiaai_bringup navigation.launch.py robot_model:=makerspet_mini map:=$HOME/maps/home.yaml
    ```
-5. **Simulation** (upstream Gazebo world):
+5. **Simulation** (upstream Gazebo world; see Part 2 for this repo's version):
    ```bash
    ros2 launch kaiaai_gazebo world.launch.py robot_model:=makerspet_mini
    ```
 
-Practical notes I ran into are collected in [docs/UPSTREAM.md](docs/UPSTREAM.md).
+Steps 3 and 4 were verified end to end on my robot (manual driving, a
+Cartographer map of my apartment, Nav2 goals reached) on 2026-10-12. Practical
+notes I ran into are collected in [docs/UPSTREAM.md](docs/UPSTREAM.md).
 
 ---
 
@@ -92,6 +94,62 @@ Practical notes I ran into are collected in [docs/UPSTREAM.md](docs/UPSTREAM.md)
 
 Each row is filled in by a milestone below; results and plots are added as they land.
 
+### Simulated odometry that drifts like the real one (`bld120_sim`, M1)
+
+The real robot computes odometry on the ESP32 from its wheel encoders and the
+PC only republishes it. Upstream's simulation instead publishes the robot's
+true pose as `/odom`, so in simulation odometry never drifts and anything
+tested there (mapping, localization, navigation) looks better than it will on
+the robot.
+
+`bld120_sim` keeps upstream's robot model and worlds, but at launch it
+reroutes Gazebo's true pose to `/ground_truth/odom` and produces `/odom` the
+way the firmware does:
+
+| Firmware (v0.8.4, `calcOdometry`) | `encoder_odometry` node |
+|---|---|
+| Quadrature encoders, 1035 PPR × 4 edges | True wheel angle quantized to 4140 ticks/rev |
+| Telemetry every 50 ms | 20 Hz integration on simulation time |
+| Midpoint (2nd-order) Euler step, `float32` | Same step, ported line by line, in `float32` |
+| Wheel diameter / track from `config.yaml` | Same values, plus optional calibration errors and random slip |
+
+```bash
+ros2 launch bld120_sim sim.launch.py                       # GUI, upstream living room
+ros2 launch bld120_sim sim.launch.py err_left_pct:=1.0     # firmware thinks the left wheel is 1 % larger
+ros2 launch bld120_sim square_test.launch.py direction:=cw output:=~/runs/cw.csv
+ros2 run bld120_sim analyze_square ~/runs/*.csv --out ~/runs
+scripts/odometry_experiment.sh                             # the full experiment below
+```
+
+**Experiment.** A 1 m square driven in both directions, steering only on
+`/odom` (leg length, heading and turns), as in the UMBmark test (Borenstein &
+Feng, 1996). If odometry were perfect, the robot would return to its start.
+Flat world, 0.1 m/s, 0.5 rad/s; the upstream simulation scores exactly 0 on
+every row by construction.
+
+| Error source | Direction | True return error | Odometry yaw error at end |
+|---|---|---|---|
+| None (quantization + simulated physics only) | CCW / CW | 0.1 / 0.5 cm | +1.0° / −1.0° |
+| Firmware left wheel diameter +1 % | CCW / CW | 22.0 / 30.3 cm | −19.2° / −24.8° |
+| Firmware wheel track +3 % | CCW / CW | 12.7 / 13.0 cm | −9.9° / +9.9° |
+| Random slip, 2 % per step (seed 7) | CCW / CW | 6.9 / 7.6 cm | −4.5° / −6.6° |
+
+The two systematic errors leave the classic UMBmark signatures, which is what
+lets them be told apart (and later, in M4, measured on the real robot):
+
+* **Unequal wheel diameters** curve every straight leg the same way, so the
+  yaw error has the *same sign* in both directions.
+* **Wrong wheel track** mis-scales every turn (3 % of 360° ≈ 10.8°, measured
+  9.9°), so the yaw error *flips sign* with direction.
+* Even with no injected error, the simulated wheels skid slightly during
+  in-place turns, an effective-track error of about ±1° per square.
+
+| Wheel diameter error | Track error |
+|---|---|
+| ![](docs/results/m1_odometry/wheel_dia_left_+1pct/square_paths.png) | ![](docs/results/m1_odometry/wheel_track_+3pct/square_paths.png) |
+
+All plots and per-run numbers: [`docs/results/m1_odometry/`](docs/results/m1_odometry/).
+
 ---
 
 ## Roadmap
@@ -99,7 +157,7 @@ Each row is filled in by a milestone below; results and plots are added as they 
 | Phase | Milestone | Status |
 |-------|-----------|--------|
 | 0 | M0: Repository skeleton, pinned upstream, workspace | ✅ |
-| 1 | M1: Encoder-based odometry in simulation | ⏳ |
+| 1 | M1: Encoder-based odometry in simulation | ✅ |
 | 1 | M2: Virtual firmware (motor model + wheel PID) | ⏳ |
 | 1 | M3: Real-robot experiment tooling and protocol | ⏳ |
 | 1 | M4: System identification, calibrated sim | ⏳ |

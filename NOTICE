@@ -15,4 +15,9 @@ Files in this repository that are adapted from upstream sources are listed
 below together with their origin. Each such file also carries a header comment
 naming its source.
 
-  (none yet)
+  bld120_sim/config/gz_bridge.yaml
+      adapted from makerspet_mini/config/gz_bridge.yaml (Maker's Pet, Apache-2.0):
+      ground-truth odometry bridged to /ground_truth/odom, its transform dropped.
+  bld120_sim/bld120_sim/odometry_model.py (FirmwareOdometry)
+      re-implements in Python the odometry integration of calcOdometry() in
+      kaiaai/firmware v0.8.4, kaiaai-esp32.ino (Kaia.ai, Apache-2.0).

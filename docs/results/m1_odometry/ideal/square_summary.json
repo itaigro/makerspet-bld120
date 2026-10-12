@@ -1,0 +1,24 @@
+[
+  {
+    "run": "ideal_ccw",
+    "duration_s": 63.199999999999996,
+    "return_error_m": 0.000723417583419148,
+    "return_error_xy_m": [
+      -0.000543,
+      -0.000478
+    ],
+    "odom_end_error_m": 0.011979857302989883,
+    "odom_end_yaw_error_deg": 0.9748303926355827
+  },
+  {
+    "run": "ideal_cw",
+    "duration_s": 63.199999999999996,
+    "return_error_m": 0.00540742609750702,
+    "return_error_xy_m": [
+      -0.004336,
+      -0.003231
+    ],
+    "odom_end_error_m": 0.012190646414362119,
+    "odom_end_yaw_error_deg": -0.9968319719686063
+  }
+]

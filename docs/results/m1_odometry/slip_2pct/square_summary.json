@@ -1,0 +1,24 @@
+[
+  {
+    "run": "slip_2pct_ccw",
+    "duration_s": 63.25,
+    "return_error_m": 0.0693462962240955,
+    "return_error_xy_m": [
+      0.02592,
+      -0.06432
+    ],
+    "odom_end_error_m": 0.057854542820767324,
+    "odom_end_yaw_error_deg": -4.496859255084266
+  },
+  {
+    "run": "slip_2pct_cw",
+    "duration_s": 63.25,
+    "return_error_m": 0.07569227703009072,
+    "return_error_xy_m": [
+      -0.038921,
+      -0.064919
+    ],
+    "odom_end_error_m": 0.0807380426936398,
+    "odom_end_yaw_error_deg": -6.578243037456008
+  }
+]

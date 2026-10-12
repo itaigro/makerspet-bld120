@@ -19,3 +19,7 @@ data/raw/
 .idea/
 *.swp
 .DS_Store
+
+# Experiment raw data (regenerable with scripts/*_experiment.sh)
+docs/results/*/csv/
+docs/results/*/logs/
