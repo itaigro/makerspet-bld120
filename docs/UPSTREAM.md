@@ -77,3 +77,15 @@ models; the world, LiDAR and upstream launch files are reused as-is.
 - The upstream `kaiaai_gazebo` README still describes the older Humble/Docker
   flow; the `jazzy` branch itself already targets Gazebo Harmonic via `ros_gz`.
 - Keep teleop slow while mapping: fast turns smear the LiDAR scans.
+- `map_saver_cli -f <dir>/<name>` needs a writable `<dir>`. A folder created
+  earlier with `sudo` (or from inside a Docker container) is owned by root, and
+  the save quietly lands elsewhere.
+- Keep the ROS install consistent: upgrade **all** `ros-jazzy-*` packages
+  together. A partial upgrade (new Nav2, old `diagnostic_updater`) makes the
+  Nav2 container die with exit code 127 (undefined symbol) and RViz reports
+  "no map received". Check with
+  `ldd -r /opt/ros/jazzy/lib/libnav2_lifecycle_manager_core.so | grep undefined`.
+- After upgrading ROS packages, rebuild C++ workspaces with
+  `colcon build --symlink-install --cmake-clean-cache`; stale CMake caches point
+  at replaced library versions (e.g. `No rule to make target libfastcdr.so.X`).
+- Stay on Ubuntu 24.04: ROS 2 Jazzy has no binaries for 26.04.
