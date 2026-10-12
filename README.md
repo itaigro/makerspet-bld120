@@ -134,6 +134,10 @@ every row by construction.
 | Firmware wheel track +3 % | CCW / CW | 12.7 / 13.0 cm | −9.9° / +9.9° |
 | Random slip, 2 % per step (seed 7) | CCW / CW | 6.9 / 7.6 cm | −4.5° / −6.6° |
 
+Repeating a run gives the same numbers to within a few millimetres and about
+0.05° (physics and timer scheduling are not bit-exact); for example, a repeat of
+the ideal CCW run returned 0.4 cm / +1.0°, and of the +1 % wheel run 21.9 cm / −19.2°.
+
 The two systematic errors leave the classic UMBmark signatures, which is what
 lets them be told apart (and later, in M4, measured on the real robot):
 
