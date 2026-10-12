@@ -16,6 +16,7 @@
   <exec_depend>ros_gz_sim</exec_depend>
   <exec_depend>ros_gz_bridge</exec_depend>
   <exec_depend>xacro</exec_depend>
+  <exec_depend>python3-catkin-pkg</exec_depend>
   <exec_depend>python3-numpy</exec_depend>
   <exec_depend>python3-matplotlib</exec_depend>
   <exec_depend>makerspet_mini</exec_depend>

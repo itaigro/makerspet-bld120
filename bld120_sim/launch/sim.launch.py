@@ -23,6 +23,7 @@ from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 import xacro
 
+from bld120_sim.gazebo_paths import gazebo_env
 from bld120_sim.urdf_patch import reroute_ground_truth
 
 ROBOT_MODEL = 'makerspet_mini'
@@ -44,15 +45,13 @@ def gazebo(world, headless):
     That launch file starts Gazebo with ``shell=True``, so a launch shutdown
     signals only ``/bin/sh`` and the Gazebo server keeps running as an orphan
     (only an interactive Ctrl-C, which signals the whole process group, stops
-    it). Without the shell, the signal reaches ``gz`` itself.
+    it). Without the shell, the signal reaches ``gz`` itself. The search paths
+    that launch file would set are reproduced by ``gazebo_env()``.
     """
-    models = os.path.join(get_package_share_directory('kaiaai_gazebo'), 'models')
-    resource_path = os.pathsep.join(
-        p for p in (os.environ.get('GZ_SIM_RESOURCE_PATH', ''), models) if p)
     cmd = ['gz', 'sim', '-r', '-v', '2'] + (['-s'] if headless else []) + [world]
     return ExecuteProcess(
         cmd=cmd, name='gazebo', output='screen',
-        additional_env={'GZ_SIM_RESOURCE_PATH': resource_path},
+        additional_env=gazebo_env(),
         on_exit=Shutdown(reason='Gazebo exited'))
 
 
