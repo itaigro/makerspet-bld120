@@ -6,6 +6,11 @@ unchanged on disk. Differences from ``kaiaai_gazebo/world.launch.py``:
 * The model's ground-truth odometry plugin is rerouted to ``/ground_truth/odom``
   (see ``bld120_sim.urdf_patch``); ``/odom`` and ``odom -> base_footprint`` come
   from the ``encoder_odometry`` node instead.
+* ``motor_model:=true`` (default) puts the ``virtual_firmware`` node between
+  ``cmd_vel`` and Gazebo: the firmware's speed ramp and wheel PID drive DC
+  motor models, and Gazebo's diff-drive plugin follows the resulting wheel
+  speeds (its own acceleration cap is lifted). ``motor_model:=false`` gives
+  upstream's ideal drive, as used for the M1 results.
 * ``headless:=true`` runs the Gazebo server only (for tests and benchmarks).
 * ``world`` accepts a file name in ``bld120_sim/worlds`` (e.g. ``flat.sdf``), in
   ``kaiaai_gazebo/worlds`` (e.g. ``living_room.world``), or a full path.
@@ -24,7 +29,7 @@ from launch_ros.actions import Node
 import xacro
 
 from bld120_sim.gazebo_paths import gazebo_env
-from bld120_sim.urdf_patch import reroute_ground_truth
+from bld120_sim.urdf_patch import free_diff_drive, reroute_ground_truth
 
 ROBOT_MODEL = 'makerspet_mini'
 
@@ -64,6 +69,9 @@ def make_nodes(context):
     urdf_path = os.path.join(
         get_package_share_directory(ROBOT_MODEL), 'urdf', 'robot.urdf.xacro')
     robot_description = reroute_ground_truth(xacro.process_file(urdf_path).toxml())
+    motor_model = arg('motor_model').lower() == 'true'
+    if motor_model:
+        robot_description = free_diff_drive(robot_description)
 
     odom_params = os.path.join(share, 'config', 'encoder_odometry.yaml')
     overrides = {
@@ -82,6 +90,8 @@ def make_nodes(context):
             output='screen',
             parameters=[{'config_file': os.path.join(share, 'config', 'gz_bridge.yaml'),
                          'use_sim_time': True}],
+            # With the motor model, Gazebo is driven by the firmware's output.
+            remappings=[('cmd_vel', 'wheel_twist')] if motor_model else [],
         ),
         Node(
             package='robot_state_publisher', executable='robot_state_publisher',
@@ -98,7 +108,11 @@ def make_nodes(context):
             package='bld120_sim', executable='encoder_odometry', output='screen',
             parameters=[odom_params, overrides],
         ),
-    ]
+    ] + ([Node(
+        package='bld120_sim', executable='virtual_firmware', output='screen',
+        parameters=[os.path.join(share, 'config', 'virtual_firmware.yaml'),
+                    {'use_sim_time': True}],
+    )] if motor_model else [])
 
 
 def generate_launch_description():
@@ -106,6 +120,9 @@ def generate_launch_description():
         DeclareLaunchArgument('world', default_value='living_room.world',
                               description='World in bld120_sim/worlds, kaiaai_gazebo/worlds, '
                                           'or a full path'),
+        DeclareLaunchArgument('motor_model', default_value='true', choices=['true', 'false'],
+                              description='Drive through the virtual firmware and motor '
+                                          'models (false: upstream ideal drive)'),
         DeclareLaunchArgument('headless', default_value='false', choices=['true', 'false'],
                               description='Run the Gazebo server only, without the GUI'),
         DeclareLaunchArgument('gz_verbosity', default_value='2', choices=['0', '1', '2', '3', '4'],

@@ -153,6 +153,66 @@ lets them be told apart (and later, in M4, measured on the real robot):
 | ![](docs/results/m1_odometry/wheel_dia_left_+1pct/square_paths.png) | ![](docs/results/m1_odometry/wheel_track_+3pct/square_paths.png) |
 
 All plots and per-run numbers: [`docs/results/m1_odometry/`](docs/results/m1_odometry/).
+They were produced with upstream's ideal drive (`motor_model:=false`, see M2).
+
+### Virtual firmware: wheel PID and motor dynamics (`bld120_sim`, M2)
+
+In upstream's simulation, Gazebo's diff-drive plugin turns `cmd_vel` straight
+into wheel speeds: acceleration is capped at 1 m/s², but stops and turns are
+instantaneous, and there is no motor, PWM or wheel controller. On the robot,
+`cmd_vel` goes through the ESP32 firmware first. The `virtual_firmware` node
+(on by default, `motor_model:=false` turns it off) runs that chain in
+simulation:
+
+| Stage | Firmware v0.8.4 | `virtual_firmware` |
+|---|---|---|
+| Command | `cmd_vel` → wheel RPM, both scaled down if one exceeds 180 RPM | Same |
+| Ramp | Linear, `base.wheel.accel.max` = 2 m/s² | Same |
+| Wheel controller | PI on encoder-measured RPM (`kp` 0.001, `ki` 0.003 per RPM), every 30 ms, *or on every loop pass while the target changes*; integral clamped; PWM duty ±1; duty 0 = brake | Same behaviour; the PI law is written from its equations ([`docs/WHEEL_CONTROLLER.md`](docs/WHEEL_CONTROLLER.md)); ~2 ms main loop |
+| Motor | 12 V N20 gear motor | First-order DC motor with a PWM dead zone and stiction: `τ dω/dt = k (u − u_c sgn ω) − ω` |
+| Wheels on the ground | Physics | Gazebo diff-drive follows the motor speeds (its own limit lifted) |
+
+The motor has three parameters (no-load speed, time constant `τ`, dead zone
+`u_c`). Until M4 measures them on the real robot, they are nominal guesses:
+200 RPM, 50 ms, 0.10.
+
+```bash
+ros2 launch bld120_sim sim.launch.py                        # virtual firmware on
+ros2 launch bld120_sim step_test.launch.py output:=~/runs/steps.csv
+scripts/drive_experiment.sh                                 # the comparison below
+```
+
+**Experiment.** The same velocity-step profile (cruise 0.1 m/s, step to
+0.2 m/s, stop, creep at 0.02 m/s, spin in place at 1 rad/s) with both drives.
+The step test is written so that M3 can run it unchanged on the real robot.
+
+| Left wheel | Upstream ideal drive | Virtual firmware (nominal motor) |
+|---|---|---|
+| 0.1 → 0.2 m/s: rise time (10–90 %) / overshoot | 80 ms / 0 % | 90 ms / 18 % |
+| 0 → 0.1 m/s: overshoot | 0 % | 21 % |
+| 0.2 m/s → stop: time to rest | 2 ms | 178 ms |
+| Spin in place: rise time / overshoot | instantaneous / 0 % | 75 ms / 22 % |
+| Steady-state error | 0 % | < 0.1 % |
+| PWM duty at 0.1 / 0.2 m/s | n/a | 0.30 / 0.50 |
+
+![](docs/results/m2_drive/steps_zoom.png)
+
+What changes for anything tested in simulation (navigation in M5–M7):
+
+* **Stopping and turning take time.** Upstream stops in one physics step; with
+  the firmware's ramp and the motor, the robot needs ~0.2 s and ~2 cm to stop
+  from 0.2 m/s, which is what Nav2's controller has to plan around.
+* **The integral-heavy PI overshoots** by ~20 % with the nominal motor. A
+  continuous-time analysis predicts ~11 %; most of the rest comes from the
+  30 ms sample period ([`docs/WHEEL_CONTROLLER.md`](docs/WHEEL_CONTROLLER.md)).
+  Whether the real robot does too is exactly what M3/M4 will measure.
+* **Low speeds are where friction matters.** At 0.02 m/s the PWM sits at 0.14,
+  just above the assumed 0.10 dead zone; a real dead zone above that would
+  make the robot stall or stutter at creep speeds (Nav2's final approach).
+
+Odometry still comes from the M1 encoder model, so a square test through the
+virtual firmware works the same way (0.5 cm return error, +1.2° drift, vs.
+0.1 cm / +1.0° with the ideal drive).
 
 ---
 
@@ -162,7 +222,7 @@ All plots and per-run numbers: [`docs/results/m1_odometry/`](docs/results/m1_odo
 |-------|-----------|--------|
 | 0 | M0: Repository skeleton, pinned upstream, workspace | ✅ |
 | 1 | M1: Encoder-based odometry in simulation | ✅ |
-| 1 | M2: Virtual firmware (motor model + wheel PID) | ⏳ |
+| 1 | M2: Virtual firmware (motor model + wheel PID) | ✅ |
 | 1 | M3: Real-robot experiment tooling and protocol | ⏳ |
 | 1 | M4: System identification, calibrated sim | ⏳ |
 | 2 | M5: Navigation benchmark harness | ⏳ |

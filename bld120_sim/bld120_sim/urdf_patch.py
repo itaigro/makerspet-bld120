@@ -39,3 +39,23 @@ def reroute_ground_truth(urdf_xml: str,
     _set_child_text(plugin, 'tf_topic', tf_topic)
     _set_child_text(plugin, 'odom_frame', frame)
     return ET.tostring(root, encoding='unicode')
+
+
+DIFF_DRIVE_PLUGIN = 'gz-sim-diff-drive-system'
+
+
+def free_diff_drive(urdf_xml: str, limit: float = 1000.0) -> str:
+    """Raise the diff-drive plugin's acceleration limits so it follows commands.
+
+    Upstream caps linear acceleration at 1 m/s^2. When the virtual firmware's
+    motor model produces the wheel speeds, that cap would add a second, fake
+    dynamic on top, so it is lifted (linear and angular).
+    """
+    root = ET.fromstring(urdf_xml)
+    plugins = [p for p in root.iter('plugin') if p.get('filename') == DIFF_DRIVE_PLUGIN]
+    if len(plugins) != 1:
+        raise ValueError(
+            f'expected exactly one {DIFF_DRIVE_PLUGIN} plugin, found {len(plugins)}')
+    for tag in ('max_linear_acceleration', 'max_angular_acceleration'):
+        _set_child_text(plugins[0], tag, str(limit))
+    return ET.tostring(root, encoding='unicode')

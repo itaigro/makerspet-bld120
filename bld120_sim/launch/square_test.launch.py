@@ -21,7 +21,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
-SIM_ARGS = ('headless', 'world', 'slip_std', 'seed',
+SIM_ARGS = ('headless', 'world', 'motor_model', 'slip_std', 'seed',
             'err_left_pct', 'err_right_pct', 'err_track_pct')
 
 
@@ -49,6 +49,7 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('headless', default_value='true', choices=['true', 'false']),
         DeclareLaunchArgument('world', default_value='flat.sdf'),
+        DeclareLaunchArgument('motor_model', default_value='true', choices=['true', 'false']),
         DeclareLaunchArgument('slip_std', default_value='0.0'),
         DeclareLaunchArgument('seed', default_value='-1'),
         DeclareLaunchArgument('err_left_pct', default_value='0.0'),

@@ -1,0 +1,102 @@
+{
+  "upstream ideal drive": {
+    "segments": [
+      {
+        "t_start_s": 0.0,
+        "cmd_left_rad_s": 0.0
+      },
+      {
+        "t_start_s": 3.008,
+        "cmd_left_rad_s": 4.651162790697675,
+        "rise_time_ms": 80.00000000000007,
+        "overshoot_pct": 0.0,
+        "steady_error_pct": -6.000000002570616e-05
+      },
+      {
+        "t_start_s": 6.008,
+        "cmd_left_rad_s": 9.30232558139535,
+        "rise_time_ms": 80.00000000000007,
+        "overshoot_pct": 9.499999997775177e-05,
+        "steady_error_pct": 4.7499999989319974e-05
+      },
+      {
+        "t_start_s": 9.008,
+        "cmd_left_rad_s": 0.0,
+        "time_to_stop_ms": 2.000000000000668
+      },
+      {
+        "t_start_s": 11.008,
+        "cmd_left_rad_s": 0.930232558139535,
+        "creep_mean_rad_s": 0.9275555925,
+        "creep_stopped_pct": 0.075
+      },
+      {
+        "t_start_s": 15.008,
+        "cmd_left_rad_s": 0.0,
+        "time_to_stop_ms": 1.9999999999988916
+      },
+      {
+        "t_start_s": 17.008,
+        "cmd_left_rad_s": -2.4428604651162793,
+        "rise_time_ms": 0.0,
+        "overshoot_pct": 0.0,
+        "steady_error_pct": 1.9039821777246348e-05
+      },
+      {
+        "t_start_s": 20.008,
+        "cmd_left_rad_s": 0.0,
+        "time_to_stop_ms": 1.9999999999988916
+      }
+    ]
+  },
+  "virtual firmware (nominal motor)": {
+    "segments": [
+      {
+        "t_start_s": 0.0,
+        "cmd_left_rad_s": 0.0
+      },
+      {
+        "t_start_s": 3.042,
+        "cmd_left_rad_s": 4.651162790697675,
+        "rise_time_ms": 80.00000000000007,
+        "overshoot_pct": 21.333745000000004,
+        "steady_error_pct": -0.010831263736256867
+      },
+      {
+        "t_start_s": 6.042,
+        "cmd_left_rad_s": 9.30232558139535,
+        "rise_time_ms": 89.99999999999986,
+        "overshoot_pct": 18.25424,
+        "steady_error_pct": -0.005603821178810531
+      },
+      {
+        "t_start_s": 9.042,
+        "cmd_left_rad_s": 0.0,
+        "time_to_stop_ms": 178.00000000000082
+      },
+      {
+        "t_start_s": 11.042,
+        "cmd_left_rad_s": 0.930232558139535,
+        "creep_mean_rad_s": 0.8926778525,
+        "creep_stopped_pct": 3.4250000000000003
+      },
+      {
+        "t_start_s": 15.042,
+        "cmd_left_rad_s": 0.0,
+        "time_to_stop_ms": 111.99999999999832
+      },
+      {
+        "t_start_s": 17.042,
+        "cmd_left_rad_s": -2.4428604651162793,
+        "rise_time_ms": 74.99999999999929,
+        "overshoot_pct": 22.091295945469945,
+        "steady_error_pct": 0.0002194239601901407
+      },
+      {
+        "t_start_s": 20.042,
+        "cmd_left_rad_s": 0.0,
+        "time_to_stop_ms": 121.99999999999989
+      }
+    ]
+  }
+}

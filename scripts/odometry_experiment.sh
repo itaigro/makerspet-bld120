@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # M1 experiment: simulated square tests (CW and CCW) under different odometry
-# error sources, then plots and a summary.
+# error sources, then plots and a summary. Uses upstream's ideal drive
+# (motor_model:=false), as the published M1 results do.
 #
 # Runs several headless simulations in parallel, each isolated with its own
 # ROS_DOMAIN_ID and GZ_PARTITION so they cannot see each other.
@@ -38,7 +39,7 @@ run_one() {  # name args direction domain
   # earlier run can never join this one.
   ROS_DOMAIN_ID="$domain" GZ_PARTITION="bld120_$$_$domain" \
     timeout 300 ros2 launch bld120_sim square_test.launch.py \
-      direction:="$dir" output:="$OUT_DIR/csv/$tag.csv" $args \
+      motor_model:=false direction:="$dir" output:="$OUT_DIR/csv/$tag.csv" $args \
       > "$OUT_DIR/logs/$tag.log" 2>&1 || echo "WARN   $tag exited with $?"
   echo "done   $tag"
 }

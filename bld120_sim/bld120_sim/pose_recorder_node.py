@@ -9,8 +9,9 @@ import math
 import os
 
 from nav_msgs.msg import Odometry
-import rclpy
 from rclpy.node import Node
+
+from bld120_sim.ros_util import run_node
 
 
 class PoseRecorder(Node):
@@ -43,12 +44,4 @@ class PoseRecorder(Node):
 
 
 def main(args=None):
-    rclpy.init(args=args)
-    node = PoseRecorder()
-    try:
-        rclpy.spin(node)
-    except KeyboardInterrupt:
-        pass
-    finally:
-        node.destroy_node()
-        rclpy.try_shutdown()
+    run_node(PoseRecorder, args)

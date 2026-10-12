@@ -17,8 +17,9 @@ import math
 
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
-import rclpy
 from rclpy.node import Node
+
+from bld120_sim.ros_util import run_node
 
 
 def yaw_from_quaternion(q):
@@ -94,6 +95,9 @@ class SquareDriver(Node):
                     remaining, self.w_max, self.w_min, self.alpha)
         self.cmd_pub.publish(cmd)
 
+    def on_exit(self):
+        self.cmd_pub.publish(Twist())
+
     @staticmethod
     def profile(remaining, v_max, v_min, accel):
         """Speed that can still stop within ``remaining`` (v^2 = 2 a d)."""
@@ -110,13 +114,4 @@ class SquareDriver(Node):
 
 
 def main(args=None):
-    rclpy.init(args=args)
-    node = SquareDriver()
-    try:
-        rclpy.spin(node)
-    except (KeyboardInterrupt, SystemExit):
-        pass
-    finally:
-        node.cmd_pub.publish(Twist())
-        node.destroy_node()
-        rclpy.try_shutdown()
+    run_node(SquareDriver, args)

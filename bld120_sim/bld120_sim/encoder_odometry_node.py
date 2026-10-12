@@ -14,12 +14,12 @@ import math
 from geometry_msgs.msg import TransformStamped
 from nav_msgs.msg import Odometry
 import numpy as np
-import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from tf2_ros import TransformBroadcaster
 
 from bld120_sim.odometry_model import EncoderModel, FirmwareOdometry
+from bld120_sim.ros_util import run_node
 
 
 class EncoderOdometryNode(Node):
@@ -116,12 +116,4 @@ class EncoderOdometryNode(Node):
 
 
 def main(args=None):
-    rclpy.init(args=args)
-    node = EncoderOdometryNode()
-    try:
-        rclpy.spin(node)
-    except KeyboardInterrupt:
-        pass
-    finally:
-        node.destroy_node()
-        rclpy.try_shutdown()
+    run_node(EncoderOdometryNode, args)

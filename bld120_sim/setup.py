@@ -25,9 +25,12 @@ setup(
     entry_points={
         'console_scripts': [
             'encoder_odometry = bld120_sim.encoder_odometry_node:main',
+            'virtual_firmware = bld120_sim.virtual_firmware_node:main',
             'square_driver = bld120_sim.square_driver_node:main',
             'pose_recorder = bld120_sim.pose_recorder_node:main',
             'analyze_square = bld120_sim.analyze_square:main',
+            'step_test = bld120_sim.step_test_node:main',
+            'analyze_steps = bld120_sim.analyze_steps:main',
         ],
     },
 )

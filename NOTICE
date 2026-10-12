@@ -18,6 +18,13 @@ naming its source.
   bld120_sim/config/gz_bridge.yaml
       adapted from makerspet_mini/config/gz_bridge.yaml (Maker's Pet, Apache-2.0):
       ground-truth odometry bridged to /ground_truth/odom, its transform dropped.
+  bld120_sim/bld120_sim/firmware_model.py
+      re-implements in Python the wheel drive chain of kaiaai/firmware v0.8.4
+      (cmd_vel handling and speed ramp in kaiaai-esp32.ino; MotorController in
+      the motor_ctl_kaia library), Kaia.ai, Apache-2.0.
+      The wheel speed law (SampledPI) is written from its mathematical
+      specification in docs/WHEEL_CONTROLLER.md. It reproduces the behaviour of
+      the firmware's PID library but contains no code from it.
   bld120_sim/bld120_sim/odometry_model.py (FirmwareOdometry)
       re-implements in Python the odometry integration of calcOdometry() in
       kaiaai/firmware v0.8.4, kaiaai-esp32.ino (Kaia.ai, Apache-2.0).
