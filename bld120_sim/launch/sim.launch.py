@@ -39,7 +39,7 @@ def resolve_world(world):
     raise FileNotFoundError(f'world {world!r} not found in bld120_sim or kaiaai_gazebo')
 
 
-def gazebo(world, headless):
+def gazebo(world, headless, verbosity):
     """Run ``gz sim`` directly rather than through ros_gz_sim's gz_sim.launch.py.
 
     That launch file starts Gazebo with ``shell=True``, so a launch shutdown
@@ -48,7 +48,7 @@ def gazebo(world, headless):
     it). Without the shell, the signal reaches ``gz`` itself. The search paths
     that launch file would set are reproduced by ``gazebo_env()``.
     """
-    cmd = ['gz', 'sim', '-r', '-v', '2'] + (['-s'] if headless else []) + [world]
+    cmd = ['gz', 'sim', '-r', '-v', verbosity] + (['-s'] if headless else []) + [world]
     return ExecuteProcess(
         cmd=cmd, name='gazebo', output='screen',
         additional_env=gazebo_env(),
@@ -76,7 +76,7 @@ def make_nodes(context):
     }
 
     return [
-        gazebo(world, headless),
+        gazebo(world, headless, arg('gz_verbosity')),
         Node(
             package='ros_gz_bridge', executable='parameter_bridge', name='gz_bridge',
             output='screen',
@@ -108,6 +108,9 @@ def generate_launch_description():
                                           'or a full path'),
         DeclareLaunchArgument('headless', default_value='false', choices=['true', 'false'],
                               description='Run the Gazebo server only, without the GUI'),
+        DeclareLaunchArgument('gz_verbosity', default_value='2', choices=['0', '1', '2', '3', '4'],
+                              description='Gazebo log level: 2 = errors and warnings, '
+                                          '4 = debug (what kaiaai_gazebo uses)'),
         DeclareLaunchArgument('x_pose', default_value='-2.0'),
         DeclareLaunchArgument('y_pose', default_value='-0.5'),
         DeclareLaunchArgument('yaw', default_value='0.0'),

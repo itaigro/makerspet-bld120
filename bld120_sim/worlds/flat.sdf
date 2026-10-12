@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!-- Empty, flat floor for odometry experiments: nothing to collide with, same
-     physics settings as kaiaai_gazebo/worlds/living_room.world (1 ms ODE step). -->
+     1 ms physics step as kaiaai_gazebo/worlds/living_room.world. Gazebo Harmonic
+     ignores type="ode" and runs its default engine, DART, in both worlds. -->
 <sdf version="1.10">
   <world name="default">
     <physics type="ode">
