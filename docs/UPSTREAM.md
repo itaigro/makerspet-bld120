@@ -39,6 +39,26 @@ what Nav2 and teleop send). As of v0.8.6 that limit check
 distance is still *below* the target, i.e. immediately after the command. Do not
 rely on it; it is irrelevant here because this repo always sends zeros.
 
+### What the firmware exposes over micro-ROS (v0.8.4)
+
+- One topic out, `telemetry` (`kaiaai_msgs/KaiaaiTelemetry2`, best effort,
+  20 Hz): odometry, wheel angle and speed (speed = angle change over the last
+  50 ms), battery mV, Wi-Fi RSSI and raw LiDAR bytes. Upstream's `telem` node
+  turns it into `/odom`, `/joint_states`, TF, `/scan` and `/battery_state`.
+- One topic in, `cmd_vel`. **There is no command timeout**: the last command
+  stays in force until a new one arrives.
+- A parameter server on the node `/pet` (low-memory mode: one parameter per
+  request). It provides:
+  - **Read-only status**, refreshed every 0.5 s: encoder counts, and target
+    RPM, measured RPM and PWM duty for each wheel. The duty is in ±1, with the
+    motor's direction applied.
+  - **Writable settings**, which take effect immediately:
+    `motor.driver.pid.{kp,ki,kd,kpm,period}`, `base.wheel.accel.max`, and
+    others. They come back from `config.yaml` at the next boot.
+  - Setting `motor.driver.pid.period` changes both the loop period and the
+    PID's reference period (`MotorController::setPIDConfig`). See
+    [`WHEEL_CONTROLLER.md`](WHEEL_CONTROLLER.md).
+
 ## BLD-120MM ↔ `makerspet_mini`
 
 The kit is not listed under its own name upstream. It is the `makerspet_mini`

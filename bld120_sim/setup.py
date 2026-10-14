@@ -31,6 +31,7 @@ setup(
             'analyze_square = bld120_sim.analyze_square:main',
             'step_test = bld120_sim.step_test_node:main',
             'analyze_steps = bld120_sim.analyze_steps:main',
+            'firmware_monitor = bld120_sim.firmware_monitor_node:main',
         ],
     },
 )

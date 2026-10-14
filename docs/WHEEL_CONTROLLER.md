@@ -115,7 +115,7 @@ linear model leaves out:
 |---|---|
 | Full virtual firmware: PI every 30 ms, dead zone 0.10, 2 m/s² ramp | 18.6 % |
 | Without the dead zone | 17.1 % |
-| PI every 2 ms instead of 30 ms | 10.9 % |
+| PI every 2 ms instead of 30 ms (same `T` = 30 ms, so same continuous gains) | 10.9 % |
 | PI every 2 ms, no dead zone | 9.7 % |
 | PI every 2 ms, no dead zone, no ramp | 10.1 % |
 
@@ -124,8 +124,32 @@ half the motor's time constant (50 ms). The measured speed is an average over
 the last sample, so the controller acts on information ~15–30 ms old, and that
 delay erodes the damping. With fast sampling the model returns to the ~10 %
 the continuous analysis predicts. The dead zone adds ~1.5 points: the integral
-also has to carry the friction offset. On the real robot this is an argument
-for a shorter `pid.period`, which M4 can test once the motor is identified.
+also has to carry the friction offset.
 
-M4 will repeat this comparison with the motor values identified on the real
-robot.
+### Changing the period on the robot: scale `ki` too
+
+On the robot, one parameter, `motor.driver.pid.period`, sets *both* how often
+the loop runs and the reference period `T` the gains are defined against
+(`MotorController::setPIDConfig`). Shortening it alone therefore also raises
+the continuous integral gain `K_i / T`: at 10 ms it triples. To sample faster
+*with the same controller*, scale `ki` by the same factor:
+
+```
+ki_new = ki · period_new / period_old        0.003 · 10/30 = 0.001
+```
+
+(`K_p` multiplies the error directly, with no `ρ`, so it stays.) The M3
+rehearsal in simulation (`scripts/rehearse_experiments.sh`) runs all three
+settings through the same tools as the robot:
+
+| PID setting (simulation, nominal motor) | Overshoot, 0.1 → 0.2 m/s / spin | Rise time | Stop from 0.2 m/s |
+|---|---|---|---|
+| period 30 ms, `ki` 0.003 (stock) | 18 % / 22 % | 90 ms | 177 ms |
+| period 10 ms, `ki` 0.001: same controller, sampled faster | **12 % / 13 %** | 89 ms | 177 ms |
+| period 10 ms, `ki` 0.003: only the period changed | 35 % / 45 % | 45 ms | 122 ms |
+
+Sampling faster with the same continuous gains brings the overshoot down to
+about the ~11 % the continuous analysis predicts. Changing the period alone
+gives a faster but much more oscillatory loop.
+
+M3/M4 run the same three settings on the real robot.

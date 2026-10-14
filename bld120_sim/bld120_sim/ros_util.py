@@ -1,6 +1,21 @@
 """Shared entry point for this package's nodes."""
+import time
+
+from geometry_msgs.msg import Twist
 import rclpy
 from rclpy.executors import ExternalShutdownException
+
+
+def send_stop(publisher, repeats=3, interval=0.05):
+    """Publish a zero ``Twist`` a few times.
+
+    The robot's firmware has no command timeout: it keeps driving the last
+    ``cmd_vel`` it received, so the stop must get through.
+    """
+    for i in range(repeats):
+        publisher.publish(Twist())
+        if i + 1 < repeats:
+            time.sleep(interval)
 
 
 def run_node(node_class, args=None):

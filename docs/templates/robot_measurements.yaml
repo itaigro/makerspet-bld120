@@ -1,0 +1,13 @@
+# Static measurements of the robot (docs/PROTOCOL.md, section 2).
+# Copy to ~/bld120_runs/robot_measurements.yaml and fill in.
+date: ""                    # YYYY-MM-DD
+mass_g:                     # with battery
+wheel_diameter_mm:
+  left:
+  right:
+track_width_mm:             # centre of left tyre contact to centre of right
+mark_spacing_cm:            # front reference mark to rear reference mark
+axle_from_rear_cm:          # rear reference mark to wheel axle, along the centre line
+floor: ""                   # e.g. PVC parquet, wood parquet
+battery_v_start:            # if you looked (ros2 topic echo /battery_state --once)
+notes: ""

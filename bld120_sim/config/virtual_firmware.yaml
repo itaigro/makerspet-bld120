@@ -1,27 +1,34 @@
 # Virtual firmware: Kaia.ai firmware v0.8.4 drive chain (BDC-30P config.yaml)
-# plus a DC gear-motor model. Motor values are nominal N20 12 V 150:1 guesses
-# until M4 identifies them on the real robot.
+# plus a DC gear-motor model. Firmware parameters keep the firmware's names, so
+# the same `ros2 param` commands work on the robot (/pet) and here.
+# Motor values are nominal N20 12 V 150:1 guesses until M4 identifies them.
 virtual_firmware:
   ros__parameters:
-    geometry:
-      wheel_dia: 0.043
-      wheel_track: 0.105043
-    encoder:
-      ticks_per_rev: 4140
-    accel_max: 2.0            # base.wheel.accel.max [m/s^2]
-    pid:                      # motor.driver.pid
-      period: 0.03
-      kp: 0.001
-      ki: 0.003
-      kd: 0.0
+    base:
+      wheel:
+        diameter: 0.043
+        track: 0.105043
+        accel:
+          max: 2.0            # m/s^2
     motor:
-      max_rpm: 180.0          # motor.rpm.max (derated)
+      encoder:
+        ppr: 1035             # x4 quadrature = 4140 ticks/rev
+      rpm:
+        max: 180.0            # derated
+      driver:
+        pid:
+          period: 0.03
+          kp: 0.001
+          ki: 0.003
+          kd: 0.0
+    motor_model:              # simulation only
       no_load_rpm: 200.0      # wheel RPM at full PWM
       tau: 0.05               # s, incl. the robot's inertia
       dead_zone: 0.10         # PWM duty to overcome friction
     physics_dt: 0.001
     loop_period: 0.002        # firmware main-loop pass
     tick_period: 0.005        # how often the node runs (simulation time)
+    status_period: 0.5        # status parameter refresh, as the firmware
     joints:
       left: wheel_left_joint
       right: wheel_right_joint

@@ -40,6 +40,12 @@ def load(path):
     return data
 
 
+def first_command_time(data):
+    """Time of the first non-zero command: the common time origin of all runs."""
+    moving = (data['cmd_v'] != 0) | (data['cmd_w'] != 0)
+    return data['t'][np.argmax(moving)]
+
+
 def segments(data):
     """(start index, end index, commanded left speed) for each constant command."""
     cmd = np.column_stack([data['cmd_v'], data['cmd_w']])
@@ -99,11 +105,14 @@ def main():
     # Full response
     fig, (ax, ax_duty) = plt.subplots(2, 1, figsize=(11, 6.5), sharex=True,
                                       gridspec_kw={'height_ratios': [3, 1]})
-    t_ref = runs[0]['t'][0]
-    ax.step(runs[0]['t'] - t_ref, runs[0]['cmd_left'], where='post', color='#57606a',
+    # Runs start recording at slightly different moments; align them on their
+    # first command, shown at 1 s (the profile's initial pause).
+    for data in runs:
+        data['t_plot'] = data['t'] - first_command_time(data) + 1.0
+    ax.step(runs[0]['t_plot'], runs[0]['cmd_left'], where='post', color='#57606a',
             lw=1, ls=':', label='command')
     for data, label, color in zip(runs, labels, COLORS):
-        t = data['t'] - data['t'][0]
+        t = data['t_plot']
         ax.plot(t, data['js_left'], color=color, lw=1.4, label=label)
         if not np.all(np.isnan(data['duty_left'])):
             ax_duty.plot(t, data['duty_left'], color=color, lw=1, label=f'{label} duty')
@@ -119,17 +128,16 @@ def main():
 
     # Zooms: acceleration step, stop, creep
     seg0 = segments(runs[0])
-    starts = [runs[0]['t'][a] - t_ref for a, _, _ in seg0]
+    starts = [runs[0]['t_plot'][a] for a, _, _ in seg0]
     windows = (('0.10 -> 0.20 m/s', starts[2] - 0.1, starts[2] + 0.6),
                ('0.20 m/s -> stop', starts[3] - 0.1, starts[3] + 0.6),
                ('creep 0.02 m/s', starts[4] - 0.2, starts[5] + 0.3))
     fig, axes = plt.subplots(1, 3, figsize=(13, 4))
     for axz, (title, lo, hi) in zip(axes, windows):
-        axz.step(runs[0]['t'] - t_ref, runs[0]['cmd_left'], where='post', color='#57606a',
+        axz.step(runs[0]['t_plot'], runs[0]['cmd_left'], where='post', color='#57606a',
                  lw=1, ls=':', label='command')
         for data, label, color in zip(runs, labels, COLORS):
-            axz.plot(data['t'] - data['t'][0], data['js_left'], color=color, lw=1.4,
-                     label=label)
+            axz.plot(data['t_plot'], data['js_left'], color=color, lw=1.4, label=label)
         axz.set_xlim(lo, hi)
         axz.set_title(title)
         axz.set_xlabel('time [s]')

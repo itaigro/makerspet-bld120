@@ -1,0 +1,3 @@
+run_folder,experiment,direction,f1_x_cm,f1_y_cm,r1_x_cm,r1_y_cm,notes
+# x: along the start tape from R0, forward; y: perpendicular to it, + left. Delete this line and the example.
+square_20261020_101500,square,ccw,10.4,1.2,-1.6,0.9,example row

@@ -214,6 +214,65 @@ Odometry still comes from the M1 encoder model, so a square test through the
 virtual firmware works the same way (0.5 cm return error, +1.2° drift, vs.
 0.1 cm / +1.0° with the ideal drive).
 
+### Real-robot experiments (`bld120_bringup`, M3)
+
+To calibrate the simulation, the same experiments have to run on the real
+robot. One launch file runs each of them next to upstream's normal robot
+bringup, and records everything into its own timestamped folder:
+
+```bash
+ros2 launch bld120_bringup experiment.launch.py experiment:=steps       # velocity steps
+ros2 launch bld120_bringup experiment.launch.py experiment:=staircase   # wheels up: PWM vs speed
+ros2 launch bld120_bringup experiment.launch.py experiment:=line        # 1 m straight
+ros2 launch bld120_bringup experiment.launch.py experiment:=square direction:=cw
+```
+
+| In each run folder | Content |
+|---|---|
+| `bag/` | `telemetry` (the firmware's raw message), `/joint_states`, `/odom`, `/cmd_vel`, `/battery_state` |
+| `firmware.csv` | Target RPM, measured RPM and **PWM duty** per wheel, read from the firmware's parameters (0.5 s) |
+| `firmware.json` | The PID gains, period and ramp the run actually used |
+| `steps.csv` / `odom.csv` | The experiment's own recording |
+| `run.yaml` | Arguments, start time, notes |
+
+What the robot can and cannot tell us shaped the tooling:
+
+* **PWM duty is only visible as a firmware parameter**, refreshed every 0.5 s.
+  It is too slow for dynamics, but enough for the steady duty-vs-speed curve.
+  A wheels-up staircase gives the motor's gain and dead zone without needing
+  any floor space. Fast dynamics come from the 20 Hz wheel data.
+* **The firmware's PID gains and period can be changed live**
+  (`ros2 param set /pet motor.driver.pid.period 0.01`). `virtual_firmware`
+  now uses the same parameter names and accepts the same live changes, so
+  every command in the protocol works unchanged in simulation.
+* **The firmware has no `cmd_vel` timeout.** If the link drops, the robot keeps
+  driving. The experiment nodes send a repeated stop on exit, and a guard
+  (`experiments.MotionGuard`) stops a run that drives further or longer than
+  planned, or whose odometry stops arriving. Every experiment has a
+  `dry_run:=true`.
+
+The full procedure (safety, static measurements, then the staircase, step
+tests, straight line and UMBmark squares, with a tape-measure method for the
+end pose) is in [`docs/PROTOCOL.md`](docs/PROTOCOL.md).
+`scripts/rehearse_experiments.sh` runs the whole protocol against the
+simulation first. It checks the tools and gives the simulation's prediction
+for every experiment.
+
+**A finding from the rehearsal.** On the firmware, `pid.period` also sets the
+reference period the gains are defined against. So shortening the period
+alone *raises* the integral gain, and the overshoot grows instead of
+shrinking:
+
+| PID setting (simulation, nominal motor) | Overshoot, 0.1 → 0.2 m/s / spin | Rise time | Stop from 0.2 m/s |
+|---|---|---|---|
+| period 30 ms, `ki` 0.003 (stock) | 18 % / 22 % | 90 ms | 177 ms |
+| period 10 ms, `ki` 0.001: same controller, sampled faster | **12 % / 13 %** | 89 ms | 177 ms |
+| period 10 ms, `ki` 0.003: only the period changed | 35 % / 45 % | 45 ms | 122 ms |
+
+![](docs/results/m3_rehearsal/steps_zoom.png)
+
+The protocol runs all three settings on the robot.
+
 ---
 
 ## Roadmap
@@ -223,7 +282,7 @@ virtual firmware works the same way (0.5 cm return error, +1.2° drift, vs.
 | 0 | M0: Repository skeleton, pinned upstream, workspace | ✅ |
 | 1 | M1: Encoder-based odometry in simulation | ✅ |
 | 1 | M2: Virtual firmware (motor model + wheel PID) | ✅ |
-| 1 | M3: Real-robot experiment tooling and protocol | ⏳ |
+| 1 | M3: Real-robot experiment tooling and protocol | ✅ tooling; robot runs pending |
 | 1 | M4: System identification, calibrated sim | ⏳ |
 | 2 | M5: Navigation benchmark harness | ⏳ |
 | 2 | M6: Controller/planner comparison, tuned config | ⏳ |

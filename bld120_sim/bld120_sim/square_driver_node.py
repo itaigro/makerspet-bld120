@@ -10,8 +10,13 @@ real robot) measures odometry drift. Running the square in both directions
 separates systematic errors (wheel diameter vs. track width, Borenstein &
 Feng 1996).
 
+With ``shape:=line`` it drives a single straight leg of ``side`` metres: the
+tape-measured distance against the odometry distance calibrates the mean wheel
+diameter.
+
 The node exits when the square is finished, so a launch file can shut down
-on its exit.
+on its exit. A ``MotionGuard`` stops it if the robot leaves the square's area,
+takes far longer than planned, or its odometry stops arriving.
 """
 import math
 
@@ -19,7 +24,8 @@ from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from rclpy.node import Node
 
-from bld120_sim.ros_util import run_node
+from bld120_sim.experiments import MotionGuard
+from bld120_sim.ros_util import run_node, send_stop
 
 
 def yaw_from_quaternion(q):
@@ -44,9 +50,19 @@ class SquareDriver(Node):
         self.k_heading = p('heading_gain', 2.0).value      # (rad/s) per rad of heading error
         self.v_min, self.w_min = 0.02, 0.1                 # creep speeds near the target
         self.start_delay = p('start_delay', 2.0).value     # s, let odometry settle
+        shape = p('shape', 'square').value
+        dry_run = p('dry_run', False).value
+        if shape not in ('square', 'line'):
+            raise ValueError(f"shape must be 'square' or 'line', not {shape!r}")
+        legs, turns = (4, 4) if shape == 'square' else (1, 0)
+        self.n_segments = legs + turns
+        reach = self.side * (math.sqrt(2.0) if shape == 'square' else 1.0)
+        planned_time = legs * self.side / self.v_max + turns * (math.pi / 2) / self.w_max
+        self.guard = MotionGuard(max_distance=reach + 0.3,
+                                 max_duration=2.0 * planned_time + 20.0)
 
         self.pose = None
-        self.segment = 0        # 0, 2, 4, 6: drive; 1, 3, 5, 7: turn
+        self.segment = 0        # even: drive; odd: turn
         self.segment_start = None
         self.start_time = None
         self.done = False
@@ -55,12 +71,20 @@ class SquareDriver(Node):
         self.create_subscription(Odometry, 'odom', self.on_odom, 10)
         self.create_timer(0.02, self.on_timer)
         self.get_logger().info(
-            f'square: side {self.side} m, {"CCW" if self.direction > 0 else "CW"}, '
-            f'{self.v_max} m/s, {self.w_max} rad/s')
+            f'{shape}: side {self.side} m, {"CCW" if self.direction > 0 else "CW"}, '
+            f'{self.v_max} m/s, {self.w_max} rad/s, about {planned_time:.0f} s; guard '
+            f'{self.guard.max_distance:.2f} m / {self.guard.max_duration:.0f} s')
+        if dry_run:
+            self.get_logger().info('dry run: not moving')
+            raise SystemExit
 
     def on_odom(self, msg):
         p = msg.pose.pose
         self.pose = (p.position.x, p.position.y, yaw_from_quaternion(p.orientation))
+        self.guard.update_pose(p.position.x, p.position.y, self.now())
+
+    def now(self):
+        return self.get_clock().now().nanoseconds * 1e-9
 
     def on_timer(self):
         if self.done or self.pose is None:
@@ -70,6 +94,12 @@ class SquareDriver(Node):
             self.start_time = now
         if (now - self.start_time).nanoseconds * 1e-9 < self.start_delay:
             return
+        if self.guard.t_start is None:
+            self.guard.start(self.now())
+        reason = self.guard.check(self.now())
+        if reason:
+            self.get_logger().error(f'stopping: {reason}')
+            raise SystemExit
         if self.segment_start is None:
             self.segment_start = self.pose
 
@@ -96,7 +126,7 @@ class SquareDriver(Node):
         self.cmd_pub.publish(cmd)
 
     def on_exit(self):
-        self.cmd_pub.publish(Twist())
+        send_stop(self.cmd_pub)
 
     @staticmethod
     def profile(remaining, v_max, v_min, accel):
@@ -107,9 +137,11 @@ class SquareDriver(Node):
         self.cmd_pub.publish(Twist())
         self.segment += 1
         self.segment_start = self.pose
-        if self.segment == 8:
+        if self.segment == self.n_segments:
             self.done = True
-            self.get_logger().info(f'square finished, odometry pose {self.pose}')
+            x, y, yaw = self.pose
+            self.get_logger().info(
+                f'finished; odometry pose x={x:.4f} m y={y:.4f} m yaw={math.degrees(yaw):.2f} deg')
             raise SystemExit
 
 

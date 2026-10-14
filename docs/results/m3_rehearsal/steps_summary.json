@@ -1,0 +1,152 @@
+{
+  "period 30 ms, ki 0.003 (stock)": {
+    "segments": [
+      {
+        "t_start_s": 0.0,
+        "cmd_left_rad_s": 0.0
+      },
+      {
+        "t_start_s": 3.0799999999999983,
+        "cmd_left_rad_s": 4.651162790697675,
+        "rise_time_ms": 80.00000000000185,
+        "overshoot_pct": 21.452209999999994,
+        "steady_error_pct": -0.005662672327663819
+      },
+      {
+        "t_start_s": 6.0809999999999995,
+        "cmd_left_rad_s": 9.30232558139535,
+        "rise_time_ms": 89.99999999999986,
+        "overshoot_pct": 18.172969999999978,
+        "steady_error_pct": -0.006292529970013394
+      },
+      {
+        "t_start_s": 9.079999999999998,
+        "cmd_left_rad_s": 0.0,
+        "time_to_stop_ms": 177.00000000000315
+      },
+      {
+        "t_start_s": 11.079999999999998,
+        "cmd_left_rad_s": 0.930232558139535,
+        "creep_mean_rad_s": 0.892471475,
+        "creep_stopped_pct": 3.4250000000000003
+      },
+      {
+        "t_start_s": 15.079999999999998,
+        "cmd_left_rad_s": 0.0,
+        "time_to_stop_ms": 112.00000000000188
+      },
+      {
+        "t_start_s": 17.081,
+        "cmd_left_rad_s": -2.4428604651162793,
+        "rise_time_ms": 74.99999999999929,
+        "overshoot_pct": 22.02334282151117,
+        "steady_error_pct": 0.0068848547186091446
+      },
+      {
+        "t_start_s": 20.08,
+        "cmd_left_rad_s": 0.0,
+        "time_to_stop_ms": 121.99999999999989
+      }
+    ]
+  },
+  "period 10 ms, ki 0.001": {
+    "segments": [
+      {
+        "t_start_s": 0.0,
+        "cmd_left_rad_s": 0.0
+      },
+      {
+        "t_start_s": 3.0449999999999946,
+        "cmd_left_rad_s": 4.651162790697675,
+        "rise_time_ms": 80.0000000000054,
+        "overshoot_pct": 13.12698000000001,
+        "steady_error_pct": 0.0006593156843281989
+      },
+      {
+        "t_start_s": 6.044999999999995,
+        "cmd_left_rad_s": 9.30232558139535,
+        "rise_time_ms": 88.99999999999864,
+        "overshoot_pct": 12.303255000000002,
+        "steady_error_pct": 0.0003419705294454012
+      },
+      {
+        "t_start_s": 9.044999999999995,
+        "cmd_left_rad_s": 0.0,
+        "time_to_stop_ms": 176.9999999999996
+      },
+      {
+        "t_start_s": 11.044999999999995,
+        "cmd_left_rad_s": 0.930232558139535,
+        "creep_mean_rad_s": 0.892103105,
+        "creep_stopped_pct": 3.3000000000000003
+      },
+      {
+        "t_start_s": 15.044999999999995,
+        "cmd_left_rad_s": 0.0,
+        "time_to_stop_ms": 112.00000000000188
+      },
+      {
+        "t_start_s": 17.044999999999995,
+        "cmd_left_rad_s": -2.4428604651162793,
+        "rise_time_ms": 79.9999999999983,
+        "overshoot_pct": 13.460430490370602,
+        "steady_error_pct": -0.010383928486424263
+      },
+      {
+        "t_start_s": 20.044999999999995,
+        "cmd_left_rad_s": 0.0,
+        "time_to_stop_ms": 127.00000000000955
+      }
+    ]
+  },
+  "period 10 ms, ki 0.003": {
+    "segments": [
+      {
+        "t_start_s": 0.0,
+        "cmd_left_rad_s": 0.0
+      },
+      {
+        "t_start_s": 3.021000000000001,
+        "cmd_left_rad_s": 4.651162790697675,
+        "rise_time_ms": 39.99999999999204,
+        "overshoot_pct": 39.565315,
+        "steady_error_pct": 0.002278366633353013
+      },
+      {
+        "t_start_s": 6.021000000000001,
+        "cmd_left_rad_s": 9.30232558139535,
+        "rise_time_ms": 45.000000000001705,
+        "overshoot_pct": 34.66819999999997,
+        "steady_error_pct": -0.0013157417582201345
+      },
+      {
+        "t_start_s": 9.021,
+        "cmd_left_rad_s": 0.0,
+        "time_to_stop_ms": 121.99999999999989
+      },
+      {
+        "t_start_s": 11.021,
+        "cmd_left_rad_s": 0.930232558139535,
+        "creep_mean_rad_s": 0.9164665400000002,
+        "creep_stopped_pct": 1.425
+      },
+      {
+        "t_start_s": 15.021,
+        "cmd_left_rad_s": 0.0,
+        "time_to_stop_ms": 57.00000000000216
+      },
+      {
+        "t_start_s": 17.021,
+        "cmd_left_rad_s": -2.4428604651162793,
+        "rise_time_ms": 34.99999999999659,
+        "overshoot_pct": 44.65377988062031,
+        "steady_error_pct": -0.027654009689931206
+      },
+      {
+        "t_start_s": 20.021,
+        "cmd_left_rad_s": 0.0,
+        "time_to_stop_ms": 66.99999999999307
+      }
+    ]
+  }
+}
