@@ -131,19 +131,22 @@ def main():
     fig.tight_layout()
     fig.savefig(os.path.join(args.out, 'steps_response.png'), dpi=120)
 
-    # Zooms: acceleration step, stop, creep
-    seg0 = segments(runs[0])
-    starts = [runs[0]['t_plot'][a] for a, _, _ in seg0]
-    windows = (('0.10 -> 0.20 m/s', starts[2] - 0.1, starts[2] + 0.6),
-               ('0.20 m/s -> stop', starts[3] - 0.1, starts[3] + 0.6),
-               ('creep 0.02 m/s', starts[4] - 0.2, starts[5] + 0.3))
+    # Zooms: acceleration step, stop, creep. The command timer quantises each
+    # step's start (10 Hz on the robot), so every panel aligns each run on that
+    # step's own start instead of only on the first command.
+    starts = [[data['t_plot'][a] for a, _, _ in segments(data)] for data in runs]
+    windows = (('0.10 -> 0.20 m/s', 2, 2, -0.1, 0.6),
+               ('0.20 m/s -> stop', 3, 3, -0.1, 0.6),
+               ('creep 0.02 m/s', 4, 5, -0.2, 0.3))
     fig, axes = plt.subplots(1, 3, figsize=(13, 4))
-    for axz, (title, lo, hi) in zip(axes, windows):
+    for axz, (title, first, last, before, after) in zip(axes, windows):
+        ref = starts[0][first]
         axz.step(runs[0]['t_plot'], runs[0]['cmd_left'], where='post', color='#57606a',
                  lw=1, ls=':', label='command')
-        for data, label, color in zip(runs, labels, COLORS):
-            axz.plot(data['t_plot'], data['js_left'], color=color, lw=1.4, label=label)
-        axz.set_xlim(lo, hi)
+        for data, run_starts, label, color in zip(runs, starts, labels, COLORS):
+            axz.plot(data['t_plot'] - run_starts[first] + ref, data['js_left'], color=color,
+                     lw=1.4, label=label)
+        axz.set_xlim(ref + before, starts[0][last] + after)
         axz.set_title(title)
         axz.set_xlabel('time [s]')
         axz.grid(alpha=0.3)
