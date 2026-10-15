@@ -284,7 +284,7 @@ The protocol runs all three settings on the robot.
 | 0 | M0: Repository skeleton, pinned upstream, workspace | ✅ |
 | 1 | M1: Encoder-based odometry in simulation | ✅ |
 | 1 | M2: Virtual firmware (motor model + wheel PID) | ✅ |
-| 1 | M3: Real-robot experiment tooling and protocol | ✅ tooling; robot runs pending |
+| 1 | M3: Real-robot experiment tooling and protocol | ✅ tooling; robot runs in progress (staircase, steps, line done; UMBmark squares to do) |
 | 1 | M4: System identification, calibrated sim | ⏳ |
 | 2 | M5: Navigation benchmark harness | ⏳ |
 | 2 | M6: Controller/planner comparison, tuned config | ⏳ |
