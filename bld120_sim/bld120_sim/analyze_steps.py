@@ -37,6 +37,11 @@ def load(path):
 
     data = {k: col(k) for k in rows[0].keys()}
     data['cmd_left'] = (data['cmd_v'] - 0.5 * WHEEL_TRACK * data['cmd_w']) / WHEEL_RADIUS
+    # On the real robot the left wheel's joint turns negative when driving
+    # forward (mirrored motor); in simulation it is positive. Use the sign
+    # that agrees with the command.
+    if np.nansum(data['js_left'] * data['cmd_left']) < 0:
+        data['js_left'] = -data['js_left']
     return data
 
 

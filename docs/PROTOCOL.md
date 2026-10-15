@@ -87,22 +87,22 @@ robot drives about 1 m forward in steps (0.1 m/s, 0.2 m/s, stop, creep at
 
 ```bash
 ros2 launch bld120_bringup experiment.launch.py experiment:=steps dry_run:=true
-ros2 launch bld120_bringup experiment.launch.py experiment:=steps    # 3 runs
+ros2 launch bld120_bringup experiment.launch.py experiment:=steps    # run this line 3 times
 ```
 
-Then two other PID settings, 3 runs each, carrying the robot back between
-runs. `ros2 param set` changes the firmware live. The values return to
+Each launch is **one run**: start it again for the next one, carrying the
+robot back to the start in between. Then two other PID settings, 3 runs each. `ros2 param set` changes the firmware live. The values return to
 normal when the robot reboots, but restore them anyway at the end:
 
 ```bash
 # A: faster sampling, same controller (ki scaled with the period; see docs/WHEEL_CONTROLLER.md)
 ros2 param set /pet motor.driver.pid.period 0.01
 ros2 param set /pet motor.driver.pid.ki 0.001
-ros2 launch bld120_bringup experiment.launch.py experiment:=steps    # 3 runs
+ros2 launch bld120_bringup experiment.launch.py experiment:=steps    # run this line 3 times
 
 # B: faster sampling with the stock per-period gains (3x the integral gain)
 ros2 param set /pet motor.driver.pid.ki 0.003
-ros2 launch bld120_bringup experiment.launch.py experiment:=steps    # 3 runs
+ros2 launch bld120_bringup experiment.launch.py experiment:=steps    # run this line 3 times
 
 # restore
 ros2 param set /pet motor.driver.pid.period 0.03
