@@ -41,9 +41,11 @@ rely on it; it is irrelevant here because this repo always sends zeros.
 
 ### What the firmware exposes over micro-ROS (v0.8.4)
 
-- One topic out, `telemetry` (`kaiaai_msgs/KaiaaiTelemetry2`, best effort,
-  20 Hz): odometry, wheel angle and speed (speed = angle change over the last
-  50 ms), battery mV, Wi-Fi RSSI and raw LiDAR bytes. Upstream's `telem` node
+- One topic out, `telemetry` (`kaiaai_msgs/KaiaaiTelemetry2`, best effort):
+  odometry, wheel angle and speed (angle change since the previous message),
+  battery mV, Wi-Fi RSSI and raw LiDAR bytes. It goes out every 50 ms, *and*
+  whenever the LiDAR buffer fills (`spinTelem(true)` in `lidar.h`). With the
+  LD14P spinning, that measured **~40 Hz** at irregular 16–31 ms intervals. Upstream's `telem` node
   turns it into `/odom`, `/joint_states`, TF, `/scan` and `/battery_state`.
 - One topic in, `cmd_vel`. **There is no command timeout**: the last command
   stays in force until a new one arrives.
@@ -91,6 +93,10 @@ Phase 1 of this repo replaces the odometry and actuation parts with realistic
 models; the world, LiDAR and upstream launch files are reused as-is.
 
 ## Practical notes
+
+- `/battery_state` `percentage` uses `makerspet_mini/config/telem.yaml`
+  (`voltage_full: 9.0`, `voltage_empty: 6.8`). A full 2S Li-ion pack is
+  8.4 V, so a freshly charged battery reads ~72 %. Trust `voltage`.
 
 - Wi-Fi must be 2.4 GHz, without client isolation, for the robot to reach the
   micro-ROS agent.

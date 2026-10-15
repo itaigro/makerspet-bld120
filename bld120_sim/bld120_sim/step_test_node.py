@@ -2,7 +2,7 @@
 
 The same profiles (``experiments.PROFILES``) run in simulation and on the real
 robot, where ``/joint_states`` velocities come from the firmware's encoder
-measurements (20 Hz). ``cmd_vel`` is republished at ``rate`` Hz like teleop or
+measurements (20-40 Hz). ``cmd_vel`` is republished at ``rate`` Hz like teleop or
 Nav2 do.
 
 Parameters:

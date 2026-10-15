@@ -240,7 +240,9 @@ What the robot can and cannot tell us shaped the tooling:
 * **PWM duty is only visible as a firmware parameter**, refreshed every 0.5 s.
   It is too slow for dynamics, but enough for the steady duty-vs-speed curve.
   A wheels-up staircase gives the motor's gain and dead zone without needing
-  any floor space. Fast dynamics come from the 20 Hz wheel data.
+  any floor space. Fast dynamics come from the wheel data in the telemetry
+  (~40 Hz on the robot: the firmware also publishes whenever a LiDAR packet
+  is ready).
 * **The firmware's PID gains and period can be changed live**
   (`ros2 param set /pet motor.driver.pid.period 0.01`). `virtual_firmware`
   now uses the same parameter names and accepts the same live changes, so

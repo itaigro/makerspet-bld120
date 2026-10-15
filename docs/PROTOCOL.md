@@ -25,15 +25,19 @@ a box or mug to put the robot on, and about 1.2 m × 1.2 m of clear floor.
 ## 1. Before you start
 
 1. Charge the battery fully. Motor speed depends on battery voltage, so the
-   voltage is recorded in every run (`/battery_state` in the bag). Recharge
-   when it drops below about 7.4 V (2 × 3.7 V).
+   voltage is recorded in every run (`/battery_state` in the bag). A full pack
+   reads about 8.4 V; recharge when it drops below about 7.4 V (2 × 3.7 V).
+   Ignore the `percentage` field: upstream computes it for a 9.0 V full /
+   6.8 V empty pack, so a full battery shows about 72 %.
 2. Start the robot as in README Part 1 (micro-ROS agent and
    `kaiaai_bringup physical.launch.py robot_model:=makerspet_mini`).
-3. In a second terminal, source the overlay and check the connection:
+3. **In every new terminal**, source this repo's overlay workspace first.
+   Without it, `ros2 launch bld120_bringup ...` fails with
+   `Package 'bld120_bringup' not found`. Then check the connection:
 
    ```bash
    source ~/ros2_workspaces/bld120_ws/install/setup.bash
-   ros2 topic hz /joint_states                # about 20 Hz
+   ros2 topic hz /joint_states                # 20-40 Hz
    ros2 param get /pet motor.driver.pid.period # 0.03
    ros2 param get /pet motor.left.pwm.now      # a number, 0.0 at rest
    ```
@@ -175,7 +179,7 @@ folders and write down what happened.
 | Data | Result |
 |---|---|
 | Staircase: PWM duty vs speed | Motor gain and dead zone (no load) |
-| Step tests: wheel speed at 20 Hz | Time constant with the robot's inertia, floor dead zone; sim vs real overshoot |
+| Step tests: wheel speed at 20-40 Hz | Time constant with the robot's inertia, floor dead zone; sim vs real overshoot |
 | Step tests at 3 PID settings | Whether faster sampling helps on the real robot as the analysis predicts |
 | Straight line | Mean wheel diameter |
 | UMBmark CW/CCW | Wheel diameter ratio and effective track width (UMBmark correction factors) |
