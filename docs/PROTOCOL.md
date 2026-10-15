@@ -123,8 +123,8 @@ sideways drift hints at the left/right difference.
    a straight line and right angles for free.
 2. Put the robot on the tape, its front and rear marks over the tape's line.
    Draw a short pencil line on the floor tape under each mark, and label them
-   **F0** and **R0**. This is the start frame: **x** runs along the tape
-   forward from R0, **y** runs to the left.
+   **F0** and **R0**. Directions: **x** runs along the tape, forward;
+   **y** runs to the left.
 3. Run:
 
    ```bash
@@ -132,9 +132,12 @@ sideways drift hints at the left/right difference.
    ```
 
 4. When it stops, mark the floor under the front and rear marks again (small
-   pieces of tape, pencil): **F1**, **R1**. For each, measure **x** (along the
-   tape from R0, to the point opposite the mark) and **y** (perpendicular
-   distance from the tape line, + left, − right). Write them into
+   pieces of tape, pencil): **F1**, **R1**. Measure how far each mark moved
+   from **its own** start mark: F1 from F0, R1 from R0.
+   * **dx:** along the tape, forward positive.
+   * **dy:** perpendicular to the tape line, + left, − right.
+
+   Write them into
    `~/bld120_runs/floor_marks.csv` (template:
    [`templates/floor_marks.csv`](templates/floor_marks.csv)), with the run
    folder's name.
@@ -159,7 +162,9 @@ wheel diameters, and the wrong track width (Borenstein & Feng 1996).
    ```
 
    Each square takes about 1 min (4 × 1 m at 0.1 m/s plus 4 turns).
-3. After each run, mark and measure F1 and R1 as in the straight-line test.
+3. After each run, mark and measure F1 and R1 as in the straight-line test
+   (each from its own start mark). The robot ends near the start, so dx is
+   small and can be negative (behind the start mark).
    Put the robot back exactly on F0/R0 for the next run.
 
 The robot ends within a few centimetres of the start, so only short

@@ -2,8 +2,8 @@ import math
 
 import pytest
 
-from bld120_sim.experiments import (MotionGuard, PROFILES, marks_to_pose, profile_at,
-                                    profile_distance, profile_duration)
+from bld120_sim.experiments import (MotionGuard, PROFILES, mark_moves_to_pose, marks_to_pose,
+                                    profile_at, profile_distance, profile_duration)
 
 
 def test_steps_profile_fits_a_short_corridor():
@@ -57,3 +57,10 @@ def test_marks_to_pose():
     # Robot facing +y, rear mark at (1, 0), axle 4 cm ahead of the rear mark.
     x, y, yaw = marks_to_pose(front=(1.0, 0.10), rear=(1.0, 0.0), axle_from_rear=0.04)
     assert (x, y, yaw) == pytest.approx((1.0, 0.04, math.pi / 2))
+
+
+def test_mark_moves_to_pose():
+    # Pure translation by 1 m: both marks move the same, heading unchanged.
+    x, y, yaw = mark_moves_to_pose((1.0, 0.0), (1.0, 0.0), mark_spacing=0.12,
+                                   axle_from_rear=0.06)
+    assert (x, y, yaw) == pytest.approx((1.06, 0.0, 0.0))

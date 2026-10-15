@@ -97,6 +97,16 @@ class MotionGuard:
         return None
 
 
+def mark_moves_to_pose(front_move, rear_move, mark_spacing, axle_from_rear):
+    """Pose of the axle centre from how far each mark moved from its start mark.
+
+    The protocol's measurement: F1 relative to F0 and R1 relative to R0, as
+    (dx, dy) in the start frame. At the start F0 = (mark_spacing, 0), R0 = (0, 0).
+    """
+    front = (mark_spacing + front_move[0], front_move[1])
+    return marks_to_pose(front, rear_move, axle_from_rear)
+
+
 def marks_to_pose(front, rear, axle_from_rear):
     """Pose (x, y, yaw) of the wheel-axle centre from two floor marks.
 
